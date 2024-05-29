@@ -1,0 +1,8 @@
+DE для C++
+
+Microsoft Visual Studio
+CLion - IDE от JetBrains
+Eclipse - с открытым исходным кодом
+NetBeans - с открытым исходным кодом
+Xсode - доступна только для macOS
+Embarcadero Dev C++ - хорошо подходит для новичков

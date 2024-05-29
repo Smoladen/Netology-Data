@@ -1,0 +1,191 @@
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <unistd.h> // libriary for sleep()
+// 1 = * it means alive
+//0 = - it means dead
+// to check around need to check j,j - + 1 and i, i - + 1 or something like this!!!
+//
+bool position_check(int i, int j);
+int number_of_alive_cells(int** array, int rows, int cols);
+
+int** create_two_dim_array(int rows, int cols){
+
+  int** array = new int* [rows];
+
+  for (int i = 0; i < rows; i++){
+    array[i] = new int[cols];
+  }
+  return array;
+}
+
+void fill_two_dim_array(int** array, int rows, int cols){
+  for(int i =0; i < rows ; i++){
+    for(int j = 0; j < cols; j++){
+      if(position_check(i,j))
+        array[i][j] = 1;// 1 = * it means alive
+      else
+        array[i][j] = 0;//0 = - it means dead
+    }
+  }
+}
+
+bool position_check(int i, int j){
+  int col_pos;
+  int row_pos;
+  std::ifstream read("in.txt");
+    bool found = false;
+    while (read >> row_pos >> col_pos) {
+      if (i == row_pos && j == col_pos) {
+        found = true;
+        break;
+      }
+    }
+    read.close();
+    return found;
+  }
+
+void print_two_dim_array(int** array, int rows, int cols){
+
+  for(int i = 0; i < rows; i++){
+    for(int j =0; j < cols; j++){
+      if (array[i][j] == 1) {
+        std::cout << '*' << ' ';
+      } else {
+        std::cout << '-' << ' ';
+      }
+    }
+    std::cout<< std::endl;
+  }
+}
+
+  int number_of_alive_cells(int** array, int rows, int cols){
+    int count = 0;
+    for(int i = 0; i < rows; i++){
+      for(int j = 0; j < cols; j++){
+        
+        if(array[i][j] == 1){
+          count++;
+        }
+      }
+    }
+    return count;
+}
+
+ void check_if_alive(int** old_array, int** new_array, int rows, int cols){
+  int alive_cells = 0;
+   
+  for(int i = 0; i < rows; i++){
+      for(int j = 0; j < cols; j++){
+          alive_cells = 0;
+
+        if ( j - 1 >= 0 ){
+          alive_cells += old_array[i][j-1];
+        }
+        if ( i + 1 < rows && j - 1 >= 0) {
+          alive_cells += old_array[i+1][j-1];
+        }
+        if ( i + 1 < rows) {
+          alive_cells += old_array[i+1][j];
+        }
+        if ( i + 1 < rows && j + 1 < cols) {
+          alive_cells += old_array[i+1][j+1];
+        }
+        if ( j + 1  <  cols) {
+          alive_cells += old_array[i][j+1];
+        }
+        if ( i - 1 >= 0 && j + 1 < cols ){
+          alive_cells += old_array[i-1][j+1];
+        }
+        if ( i - 1 >= 0 ){
+          alive_cells += old_array[i-1][j];
+        }
+        if (  i - 1 >= 0 && j - 1 >= 0){
+           alive_cells += old_array[i-1][j-1];
+        }
+
+        if(alive_cells == 3)
+          new_array[i][j] = 1;
+        if(alive_cells == 2)
+          new_array[i][j] = old_array[i][j];
+        if(alive_cells < 2 || alive_cells > 3)
+          new_array[i][j] = 0;
+     }
+  }
+}
+
+bool game_over(int** array_old, int** array_new, int rows, int cols){
+  bool condition = true;
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+     if(array_old[i][j] != array_new[i][j]){
+       condition = false;
+       break;
+      }
+    }
+    if(!condition)
+      break;
+  }
+  return condition;
+}
+
+void copy_two_dim_array(int** src, int** dest, int rows, int cols) {
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      dest[i][j] = src[i][j];
+    }
+  }
+}
+
+void delete_two_dim_array(int** array, int rows, int cols){
+
+  for(int i =0; i < rows; i++){
+    delete[] array[i];
+  }
+
+  delete[] array;
+
+}
+
+int main() {
+
+  int rows;
+  int cols;
+  int generation = 2;
+  int alive_cells;
+  
+  std::ifstream read("in.txt");
+
+  read >> rows;
+  read >> cols;
+  
+  int** created_array_old = create_two_dim_array(rows, cols);
+  int** created_array_new = create_two_dim_array(rows, cols);
+  
+  fill_two_dim_array(created_array_old,rows,cols);
+  copy_two_dim_array(created_array_old, created_array_new, rows, cols);
+  
+  print_two_dim_array(created_array_old,rows,cols);
+  std::cout << "Generation: "<< 1 <<". " << "Alive cells: "<< number_of_alive_cells(created_array_new,rows,cols) << std::endl;
+
+  do{
+    copy_two_dim_array(created_array_new, created_array_old, rows, cols);
+    check_if_alive(created_array_old,created_array_new,rows,cols);
+    print_two_dim_array(created_array_new,rows,cols);
+    std::cout << "Generation: "<< generation <<". " << "Alive cells: ";
+      alive_cells = number_of_alive_cells(created_array_new,rows,cols);
+    std::cout << alive_cells << "\n";
+    generation++;
+    usleep(300000); // to slow down the flow of the game
+  }while(game_over(created_array_old,created_array_new,rows,cols) == false && alive_cells != 0);
+  
+  if(alive_cells == 0){
+    std::cout << "All cells are dead. Game over";
+  }else if(game_over(created_array_old,created_array_new,rows,cols) != false){
+    std::cout << "The world has stagnated. Game over";
+  }
+
+  
+  delete_two_dim_array(created_array_old,rows,cols);
+  delete_two_dim_array(created_array_new,rows,cols);
+}

@@ -1,0 +1,77 @@
+#include <iostream>
+
+int MyPower(int value, int power, int result){
+  for (int i = 0; i < power; i++)
+    result *= value;
+  return result;
+}
+
+int main() {
+  int value = 5, power = 2, result = 1;
+  
+  std::cout << value << " в степени " << power << " = " << MyPower(value, power, result) << std::endl;
+  
+  value =3, power = 3, result = 1;
+  
+  std::cout << value << " в степени " << power << " = " << MyPower(value, power, result) << std::endl;
+  
+  value = 4, power = 4, result = 1;
+  
+  std::cout << value << " в степени " << power << " = " << MyPower(value, power, result) << std::endl;
+  
+  return 0;
+}
+
+					3 задание
+
+#include <iostream>
+
+int fib(int n){
+  if (n <= 1)
+  return n;
+  else
+  return fib(n - 1) + fib(n - 2);
+}
+
+int main() {
+  int number;
+  
+  std::cout << "Введите число: ";
+  std::cin >> number;
+  
+  std::cout << "Числа Фибоначчи: ";
+  for(int i = 0; i < number; i++){
+    std::cout << fib(i) << " ";
+  }
+}
+
+					3* задание
+
+#include <iostream>
+
+
+long long fib(int n){
+  if (n==0){
+    return 0;
+  }
+  long long a = 0, b = 1;
+  for(int i = 2; i <= n; i++){
+    long long nextNum = a + b;
+    a = b;
+    b = nextNum;
+  }
+  return b;
+}
+
+int main() {
+  int number;
+
+  std::cout << "Введите число: ";
+  std::cin >> number;
+
+  std::cout << "Числа Фибоначчи: ";
+  for(int i = 0; i < number; i++){
+    std::cout << fib(i) << " ";
+  }
+  return 0;
+}
